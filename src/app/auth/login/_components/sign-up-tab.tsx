@@ -19,8 +19,8 @@ export const signUpSchema = z.object({
 
 type SignUpSchema = z.infer<typeof signUpSchema>;
 
-export function SignUpTab() {
-    const router = useRouter();
+export function SignUpTab({ openEmailVerificationTab }: { openEmailVerificationTab: (email: string) => void }) {
+    // const router = useRouter();
     const form = useForm<SignUpSchema>({
         resolver: zodResolver(signUpSchema),
         defaultValues: {
@@ -38,11 +38,12 @@ export function SignUpTab() {
             callbackURL: "/",
         }, {
             onError: error => {
-                toast.error(error.error.message || "Something went wrong")
+                toast.error(error.error.message || error.error.statusText || "Something went wrong")
             },
             onSuccess: () => {
                 toast.success("Sign up successful")
-                router.push("/");
+                // router.push("/");
+                openEmailVerificationTab(data.email);
             },
         });
         console.log(data);
