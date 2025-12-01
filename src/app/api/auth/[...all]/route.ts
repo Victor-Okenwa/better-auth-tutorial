@@ -1,5 +1,5 @@
 import { toNextJsHandler } from "better-auth/next-js";
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/auth";
 import arcJet, { type BotOptions, detectBot, type EmailOptions, protectSignup, shield, slidingWindow, type SlidingWindowRateLimitOptions } from "@arcjet/next";
 import { findIp } from "@arcjet/ip";
 const aj = arcJet({

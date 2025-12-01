@@ -1,6 +1,6 @@
 import { BetterAuthActionButton } from "@/components/auth/better-auth-action-button";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { useEffect, useRef, useState } from "react";
 
 export function EmailVerificationTab({ email }: { email: string }) {

@@ -1,5 +1,5 @@
 export const SUPPORTED_OAUTH_PROVIDERS = ["github", "discord"];
-import { DiscordIcon, GithubIcon } from "../../icons/auth/oauth-icons";
+import { DiscordIcon, GithubIcon } from "../../../icons/auth/oauth-icons";
 import type { ElementType, ComponentProps } from "react";
 
 export type SupportedOAuthProvider = (typeof SUPPORTED_OAUTH_PROVIDERS)[number];

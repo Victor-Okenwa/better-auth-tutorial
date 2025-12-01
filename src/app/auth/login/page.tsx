@@ -7,10 +7,11 @@ import { Separator } from "@/components/ui/separator";
 import { SocialButtons } from "./_components/social-buttons";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { EmailVerificationTab } from "./_components/email-verification-tab";
+import { ForgotPasswordTab } from "./_components/forgot-password-tab";
 
-type Tab = "signin" | "signup" | "email-verification";
+type Tab = "signin" | "signup" | "email-verification" | "forgot-password";
 
 export default function LoginPage() {
   const [tab, setTab] = useState<Tab>("signin");
@@ -31,6 +32,10 @@ export default function LoginPage() {
     setEmail(email);
   }
 
+  function openForgotPasswordTab() {
+    setTab("forgot-password");
+  }
+
   return (
     <Tabs value={tab} onValueChange={(value) => setTab(value as Tab)} className="mx-auto mt-12 px-4 my-6" >
       {tab !== "email-verification" && (
@@ -45,11 +50,13 @@ export default function LoginPage() {
             <CardTitle>Sign In</CardTitle>
           </CardHeader>
           <CardContent>
-            <SignInTab openEmailVerificationTab={openEmailVerificationTab} />
+            <SignInTab openEmailVerificationTab={openEmailVerificationTab} openForgotPasswordTab={openForgotPasswordTab} />
 
             <Separator />
 
-            <SocialButtons />
+            <div className="mt-4 [&_button]:w-full flex *:flex-1 gap-2">
+              <SocialButtons />
+            </div>
           </CardContent>
         </Card>
       </TabsContent>
@@ -61,6 +68,11 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent>
             <SignUpTab openEmailVerificationTab={openEmailVerificationTab} />
+            <Separator />
+
+            <div className="mt-4 [&_button]:w-full flex *:flex-1 gap-2">
+              <SocialButtons />
+            </div>
           </CardContent>
         </Card>
       </TabsContent>

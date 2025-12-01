@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
 import { LoadingSwap } from "@/components/ui/loading-swap";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 
 export const signInSchema = z.object({
@@ -17,7 +17,7 @@ export const signInSchema = z.object({
 
 type SignInSchema = z.infer<typeof signInSchema>;
 
-export function SignInTab({ openEmailVerificationTab }: { openEmailVerificationTab: (email: string) => void }) {
+export function SignInTab({ openEmailVerificationTab, openForgotPasswordTab }: { openEmailVerificationTab: (email: string) => void, openForgotPasswordTab: () => void }) {
     const form = useForm<SignInSchema>({
         resolver: zodResolver(signInSchema),
         defaultValues: {
@@ -70,7 +70,10 @@ export function SignInTab({ openEmailVerificationTab }: { openEmailVerificationT
                     name="password"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Password</FormLabel>
+                            <div className="flex justify-between">
+                                <FormLabel>Password</FormLabel>
+                                <Button type="button" variant="link" disabled={isSubmitting} className="text-sm p-0 opacity-70" onClick={openForgotPasswordTab}>Forgot Password?</Button>
+                            </div>
                             <FormControl>
                                 <PasswordInput {...field} />
                             </FormControl>
@@ -82,6 +85,6 @@ export function SignInTab({ openEmailVerificationTab }: { openEmailVerificationT
                     <LoadingSwap isLoading={isSubmitting}>Sign In</LoadingSwap>
                 </Button>
             </form>
-        </Form>
+        </Form >
     );
 }

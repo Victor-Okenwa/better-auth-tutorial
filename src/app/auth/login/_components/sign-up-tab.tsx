@@ -7,14 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
 import { LoadingSwap } from "@/components/ui/loading-swap";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { NumberInput } from "@/components/ui/number-input";
 
 export const signUpSchema = z.object({
     name: z.string().min(1, "Name is required"),
     email: z.string().email("Invalid email"),
     password: z.string().min(4, "Password must be at least 4 characters"),
+    favoriteNumber: z.number().int().min(1, "Favorite number must be at least 1"),
 });
 
 type SignUpSchema = z.infer<typeof signUpSchema>;
@@ -27,6 +29,7 @@ export function SignUpTab({ openEmailVerificationTab }: { openEmailVerificationT
             name: "",
             email: "",
             password: "",
+            favoriteNumber: 1,
         },
     });
 
@@ -91,6 +94,22 @@ export function SignUpTab({ openEmailVerificationTab }: { openEmailVerificationT
                         </FormItem>
                     )}
                 />
+
+                <FormField
+                    control={form.control}
+                    name="favoriteNumber"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Favorite Number</FormLabel>
+                            <FormControl>
+                                <NumberInput {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+
                 <Button type="submit" disabled={isSubmitting} className="w-full">
                     <LoadingSwap isLoading={isSubmitting}>Sign Up</LoadingSwap>
                 </Button>

@@ -6,7 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LoadingSwap } from "@/components/ui/loading-swap";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 
 export const forgotPasswordSchema = z.object({
@@ -25,20 +25,18 @@ export function ForgotPasswordTab({ openSignInTab }: { openSignInTab: () => void
 
     const { isSubmitting } = form.formState;
 
-    async function onSubmit(data: SignInSchema) {
-        await authClient.forgotPassword({
+    async function onSubmit(data: ForgotPasswordSchema) {
+        await authClient.requestPasswordReset({
             email: data.email,
-            callbackURL: "/",
+            redirectTo: "/auth/reset-password"
         }, {
             onError: error => {
                 toast.error(error.error.message || error.error.statusText || "Something went wrong")
             },
             onSuccess: () => {
-                toast.success("Forgot password successful")
-                openSignInTab();
+                toast.success("Password reset email sent")
             },
         });
-        console.log(data);
     }
 
     return (
@@ -59,9 +57,9 @@ export function ForgotPasswordTab({ openSignInTab }: { openSignInTab: () => void
                 />
 
                 <div className="flex gap-2">
-                    <Button type="button" variant="outline" disabled={isSubmitting} className="w-full" onClick={openSignInTab}>Back</Button>
-                    <Button type="submit" disabled={isSubmitting} className="w-full">
-                        <LoadingSwap isLoading={isSubmitting}>Sign In</LoadingSwap>
+                    <Button type="button" variant="outline" disabled={isSubmitting} onClick={openSignInTab}>Back</Button>
+                    <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                        <LoadingSwap isLoading={isSubmitting}>Send Reset Email</LoadingSwap>
                     </Button>
                 </div>
             </form>
