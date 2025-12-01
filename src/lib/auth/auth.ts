@@ -6,6 +6,7 @@ import { sendPasswordResetEmail } from "../email/password-reset";
 import { sendEmailVerificationEmail } from "../email/email-verification";
 import { sendWelcomeEmail } from "../email/welcome-email";
 import { createAuthMiddleware } from "better-auth/api";
+import { sendDeleteAccountVerificationEmail } from "../email/delete-account-verification";
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
         provider: "pg",
@@ -20,6 +21,12 @@ export const auth = betterAuth({
                         email: newEmail,
                     }, url
                 })
+            },
+        },
+        deleteUser: {
+            enabled: true,
+            sendDeleteAccountEmail: async ({ user, url }: { user: User, url: string }) => {
+                await sendDeleteAccountVerificationEmail({ user, url });
             },
         },
         additionalFields: {
@@ -93,5 +100,5 @@ export const auth = betterAuth({
                 }
             }
         })
-    }
+    },
 });

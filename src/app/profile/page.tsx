@@ -12,6 +12,8 @@ import { SetPasswordButton } from "./_components/set-password-button";
 import { Suspense } from "react";
 import { ChangePasswordForm } from "./_components/change-password-form";
 import { SessionManagement } from "./_components/session-mananagement";
+import { AccountLinking } from "./_components/account-linking";
+import { AccountDeletion } from "./_components/account-deletion";
 
 export default async function ProfilePage() {
 
@@ -98,9 +100,19 @@ export default async function ProfilePage() {
                         <SessionTab currentSessionToken={session.session.token} />
                     </LoadingSuspense>
                 </TabsContent>
+                <TabsContent value="accounts">
+                    <LoadingSuspense>
+                        <LinkedAccounts />
+                    </LoadingSuspense>
+                </TabsContent>
                 <TabsContent value="accounts"></TabsContent>
-                <TabsContent value="accounts"></TabsContent>
-                <TabsContent value="danger"></TabsContent>
+                <TabsContent value="danger">
+                    <Card>
+                        <CardContent>
+                            <AccountDeletion />
+                        </CardContent>
+                    </Card>
+                </TabsContent>
             </Tabs>
         </div>
     );
@@ -147,6 +159,18 @@ async function SessionTab({
         <Card>
             <CardContent>
                 <SessionManagement sessions={sessions} currentSessionToken={currentSessionToken} />
+            </CardContent>
+        </Card>
+    )
+}
+
+async function LinkedAccounts() {
+    const accounts = await auth.api.listUserAccounts({ headers: await headers() });
+    const nonCredentialsAccounts = accounts.filter(account => account.providerId !== "credentials");
+    return (
+        <Card>
+            <CardContent>
+                <AccountLinking accounts={nonCredentialsAccounts} />
             </CardContent>
         </Card>
     )
