@@ -21,7 +21,12 @@ export default function Home() {
     ) : (
       <main className="flex flex-col items-center justify-center h-screen">
         <h1>Welcome {session.user?.name}</h1>
-        <BetterAuthActionButton size="lg" variant="destructive" className="w-full max-w-md capitalize" action={() => authClient.signOut()}>sign out</BetterAuthActionButton>
+
+        <div className="flex items-center justify-center gap-2">
+          <Button asChild ><Link href="/profile">Profile</Link></Button>
+
+          <BetterAuthActionButton size="lg" variant="destructive" className="w-full max-w-md capitalize" action={() => authClient.signOut()}>sign out</BetterAuthActionButton>
+        </div>
       </main>
     ))
 

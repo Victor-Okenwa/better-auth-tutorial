@@ -1,5 +1,5 @@
 import { db } from "@/drizzle/db";
-import { betterAuth } from "better-auth";
+import { betterAuth, User } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { sendPasswordResetEmail } from "../email/password-reset";
@@ -11,6 +11,17 @@ export const auth = betterAuth({
         provider: "pg",
     }),
     user: {
+        changeEmail: {
+            enabled: true,
+            sendEmailVerificationEmail: async ({ user, url, newEmail }: { user: User, url: string, newEmail: string }) => {
+                await sendEmailVerificationEmail({
+                    user: {
+                        ...user,
+                        email: newEmail,
+                    }, url
+                })
+            },
+        },
         additionalFields: {
             favoriteNumber: {
                 type: "number",
@@ -42,44 +53,45 @@ export const auth = betterAuth({
                     favoriteNumber: Number(profile.public_repos ?? 0),
                 }
             },
-            discord: {
-                enabled: true,
-                clientId: process.env.DISCORD_CLIENT_ID || "",
-                clientSecret: process.env.DISCORD_CLIENT_SECRET || "",
-                mapProfileToUser: () => {
-                    return {
-                        favoriteNumber: 0,
-                    }
-                },
-            },
         },
-        session: {
+        discord: {
             enabled: true,
-            cookieCache: {
-                enabled: true,
-                strategy: "compact",
-                refreshCache: {
-                    updateAge: 60 * 5, // 5 minutes
-                },
+            clientId: process.env.DISCORD_CLIENT_ID || "",
+            clientSecret: process.env.DISCORD_CLIENT_SECRET || "",
+            mapProfileToUser: () => {
+                return {
+                    favoriteNumber: 0,
+                }
             },
         },
-        plugins: [
-            nextCookies(),
-        ],
-        rateLimit: {
-            storage: "database",
+    },
+    session: {
+        enabled: true,
+        cookieCache: {
+            enabled: true,
+            strategy: "compact",
+            refreshCache: {
+                updateAge: 60 * 5, // 5 minutes
+            },
         },
-        hooks: {
-            after: createAuthMiddleware(async ctx => {
-                if (ctx.path.startsWith("/sign-up")) {
-                    const user = ctx.context.newSession?.user ?? {
-                        name: ctx.context.user?.name ?? "",
-                        email: ctx.context.user?.email ?? "",
-                    }
-                    if (user != null) {
-                        await sendWelcomeEmail(user);
-                    }
+    },
+    plugins: [
+        nextCookies(),
+    ],
+    rateLimit: {
+        storage: "database",
+    },
+    hooks: {
+        after: createAuthMiddleware(async ctx => {
+            if (ctx.path.startsWith("/sign-up")) {
+                const user = ctx.context.newSession?.user ?? {
+                    name: ctx.context.user?.name ?? "",
+                    email: ctx.context.user?.email ?? "",
                 }
-            })
-        }
-    });
+                if (user != null) {
+                    await sendWelcomeEmail(user);
+                }
+            }
+        })
+    }
+});
