@@ -36,6 +36,7 @@ export function SignUpTab({ openEmailVerificationTab }: { openEmailVerificationT
     const { isSubmitting } = form.formState;
 
     async function onSubmit(data: SignUpSchema) {
+        console.log(data);
         await authClient.signUp.email({
             ...data,
             callbackURL: "/",

@@ -83,7 +83,7 @@ function AccountCard({
             <CardContent>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                        {<providerDetails.icon className="size-5" />}
+                        {/* {<providerDetails.icon className="size-5" />} */}
                         <div>
                             <p className="font-medium">{providerDetails.name}</p>
                             {account == null ? (

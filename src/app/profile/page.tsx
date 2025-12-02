@@ -14,6 +14,7 @@ import { ChangePasswordForm } from "./_components/change-password-form";
 import { SessionManagement } from "./_components/session-mananagement";
 import { AccountLinking } from "./_components/account-linking";
 import { AccountDeletion } from "./_components/account-deletion";
+import { TwoFactorAuth } from "./_components/two-factor-auth";
 
 export default async function ProfilePage() {
 
@@ -92,7 +93,7 @@ export default async function ProfilePage() {
 
                 <TabsContent value="security">
                     <LoadingSuspense>
-                        <SecurityTab email={session.user.email} />
+                        <SecurityTab email={session.user.email} isTwoFactorEnabled={session.user.twoFactorEnabled} />
                     </LoadingSuspense>
                 </TabsContent>
                 <TabsContent value="session">
@@ -119,9 +120,13 @@ export default async function ProfilePage() {
 };
 
 
-async function SecurityTab({ email }: { email: string }) {
-    const accounts = await auth.api.listUserAccounts({ headers: await headers() });
-    const hasAccountPassword = accounts.some(account => account.providerId === "credentials");
+async function SecurityTab({ email, isTwoFactorEnabled }: { email: string, isTwoFactorEnabled: boolean }) {
+
+    const [passkeys, accounts] = await Promise.all([
+        auth.api.listUserPasskeys({ headers: await headers() }),
+        auth.api.listUserAccounts({ headers: await headers() })
+    ]);
+    const hasAccountPassword = accounts.some(account => account.providerId !== "credentials");
 
     return (
         <div className="space-y-4">
@@ -143,6 +148,29 @@ async function SecurityTab({ email }: { email: string }) {
                     </CardContent>
                 </Card>
             )}
+
+            {hasAccountPassword && (
+                <Card>
+                    <CardHeader className="flex items-center justify-between gap-2">
+                        <CardTitle>Two-Factor Authentication</CardTitle>
+                        <Badge variant={isTwoFactorEnabled ? "default" : "outline"}>{isTwoFactorEnabled ? "Enabled" : "Disabled"}</Badge>
+                    </CardHeader>
+
+                    <CardContent>
+                        <TwoFactorAuth isEnabled={isTwoFactorEnabled} />
+                    </CardContent>
+                </Card>
+            )}
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Passkeys</CardTitle>
+                </CardHeader>
+
+                <CardContent>
+                    <PassKeyManagement passkeys={passkeys} />
+                </CardContent>
+            </Card>
         </div >
     )
 }
