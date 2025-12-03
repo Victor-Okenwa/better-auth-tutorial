@@ -10,6 +10,15 @@ import { sendDeleteAccountVerificationEmail } from "../email/delete-account-veri
 import { admin as adminPlugin, organization as organizationPlugin, twoFactor } from "better-auth/plugins";
 import { passkey } from "@better-auth/passkey";
 import { ac, user, admin } from "@/components/auth/permissions";
+import { sendOrganizationInviteEmail } from "../email/organization-invite";
+import { member } from "@/drizzle/schema";
+import { desc, eq } from "drizzle-orm";
+import { stripe } from "@better-auth/stripe";
+import Stripe from "stripe";
+
+const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2025-11-17.clover",
+})
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
@@ -98,7 +107,16 @@ export const auth = betterAuth({
                 admin,
             }
         }),
-        organizationPlugin()
+        organizationPlugin({
+            sendInvitationEmail: async ({ invitation, inviter, organization, email }) => {
+                await sendOrganizationInviteEmail({ invitation, inviter: { name: inviter.user.name ?? "" }, organization: { name: organization.name ?? "" }, email: invitation.email ?? "" })
+            }
+        }),
+        stripe({
+            stripeClient,
+            stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+            createCustomerOnSignUp: true,
+        })
     ],
     rateLimit: {
         storage: "database",
@@ -116,4 +134,26 @@ export const auth = betterAuth({
             }
         })
     },
+    databaseHooks: {
+        session: {
+            create: {
+                before: async userSession => {
+                    const membership = await db.query.member.findFirst({
+                        where: eq(member.userId, userSession.userId),
+                        orderBy: desc(member.createdAt),
+                        columns: {
+                            organizationId: true,
+                        },
+                    });
+
+                    return {
+                        data: {
+                            ...userSession,
+                            activeOrganizationId: membership?.organizationId ?? null,
+                        }
+                    }
+                }
+            },
+        },
+    }
 });

@@ -3,9 +3,10 @@ import Link from "next/link"
 import { auth } from "@/lib/auth/auth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
+import { OrganizationTabs } from "./_components/organizations-tabs"
 import { OrganizationSelect } from "./_components/organization-select"
 import { CreateOrganizationButton } from "./_components/create-organization-button"
-import { OrganizationTabs } from "./_components/organization-tabs"
+
 
 export default async function OrganizationsPage() {
     const session = await auth.api.getSession({ headers: await headers() })
