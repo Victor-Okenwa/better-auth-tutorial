@@ -15,6 +15,7 @@ import { SessionManagement } from "./_components/session-mananagement";
 import { AccountLinking } from "./_components/account-linking";
 import { AccountDeletion } from "./_components/account-deletion";
 import { TwoFactorAuth } from "./_components/two-factor-auth";
+import { PassKeyManagement } from "./_components/passkey-management";
 
 export default async function ProfilePage() {
 
@@ -123,7 +124,7 @@ export default async function ProfilePage() {
 async function SecurityTab({ email, isTwoFactorEnabled }: { email: string, isTwoFactorEnabled: boolean }) {
 
     const [passkeys, accounts] = await Promise.all([
-        auth.api.listUserPasskeys({ headers: await headers() }),
+        auth.api.listPasskeys({ headers: await headers() }),
         auth.api.listUserAccounts({ headers: await headers() })
     ]);
     const hasAccountPassword = accounts.some(account => account.providerId !== "credentials");
